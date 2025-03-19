@@ -5,6 +5,7 @@ namespace TaxPayerWeb.Models
     {
         public string Name { get; set; }
         public string Address { get; set; }
-        public int PostalCode { get; set; }
+        public string PostalCode { get; set; }
+        public IFormFile ImageData { get; set; }
     }
 }

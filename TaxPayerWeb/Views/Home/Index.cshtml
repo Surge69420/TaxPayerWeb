@@ -5,7 +5,7 @@
 }
 
 
-<form class="d-flex gap-5 my-4  w-100 justify-content-between"  onsubmit="GetData(this)" style="min-height:50px" >
+<form class="d-flex gap-5 my-4  w-100 justify-content-between" onsubmit="GetData(this)" style="min-height:50px">
 	<input style="width: 30vw;min-width:300px; " class="form-control me-2 rounded-3  border-secondary text-light" name="query" placeholder="Search" aria-label="Search">
 	<button style="width: 10vw; min-width:120px; " type="button" class="btn rounded-3 btn-primary " data-bs-toggle="modal" data-bs-target="#exampleModal">
 		New Payer
@@ -13,7 +13,7 @@
 </form>
 <!-- Button trigger modal -->
 <!-- Modal -->
-<div class="modal " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -21,18 +21,21 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				<form asp-controller="Home" asp-action="CreateTable" method="post" id="form">
+				<form asp-controller="Home" asp-action="CreateTable" enctype="multipart/form-data" method="post" id="form">
 					<div class="mb-3">
 						<label for="Name" class="form-label">Name</label>
-						<input name="Name" id="Name" class="form-control" required>
+						<input name="Name" id="Name" class="form-control" placeholder="Enter your Name.." required>
 					</div>
 					<div class="mb-3">
 						<label for="Address" class="form-label">Address</label>
-						<input name="Address" id="Address" class="form-control" required>
+						<input name="Address" id="Address" class="form-control" placeholder="Enter your Address.." required>
 					</div>
 					<div class="mb-3">
 						<label for="PostalCode" class="form-label">Postal Code</label>
-						<input name="PostalCode" id="PostalCode" class="form-control" type="number" required>
+						<input name="PostalCode" pattern="^\d{4}-\d{3}$" id="PostalCode" class="form-control" type="text" placeholder="1234-123" required>
+					</div>
+					<div class="mb-3">
+						<input type="file" id="ImageData" name="ImageData" accept="image/*">
 					</div>
 				</form>
 
@@ -59,9 +62,18 @@
 		{
 			<tr>
 				<th scope="row">@taxPayer.Id</th>
-				<td>@taxPayer.Name</td>
-				<td>@taxPayer.Address</td>
-				<td>@taxPayer.PostalCode</td>
+				<td valign="middle">@taxPayer.Name</td>
+				<td valign="middle">@taxPayer.Address</td>
+				<td valign="middle">@taxPayer.PostalCode</td>
+				<td valign="middle"><img src="data:image/png;base64,@Convert.ToBase64String(taxPayer.ImageData)" /></td>
+				@if (taxPayer.CityName == null)
+				{
+					<td valign="middle">Portugal</td>
+				}
+				else
+				{
+					<td valign="middle">@taxPayer.CityName</td>
+				}
 				<td><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="@("#" + taxPayer.Id + "modal")">Edit</button></td>
 				<div class="modal fade" id="@(taxPayer.Id+"modal")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 					<div class="modal-dialog modal-dialog-centered">
@@ -86,7 +98,7 @@
 									</div>
 									<div class="mb-3">
 										<label for="PostalCode" class="form-label">Postal Code</label>
-										<input name="PostalCode" id="@(taxPayer.Id+"PostalCodeEdit")" class="form-control" type="number" value="@taxPayer.PostalCode" required>
+										<input name="PostalCode" pattern="^\d{4}-\d{3}$" id="@(taxPayer.Id+"PostalCodeEdit")" class="form-control" type="text" value="@taxPayer.PostalCode" required>
 									</div>
 								</form>
 

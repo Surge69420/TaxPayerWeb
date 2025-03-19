@@ -1,6 +1,9 @@
 html {
   font-size: 14px;
 }
+img {
+    height: 5vh;
+}
 
 @media (min-width: 768px) {
   html {

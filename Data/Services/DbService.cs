@@ -62,10 +62,14 @@ namespace Data.Services
                 return "Failed" + ex.Message;
             }
         }
-
+        public string GetCity(int id)
+        {
+            var city = _context._Cities.FirstOrDefault(x => x.PostCode == id);
+            return city?.CityName ?? "Portugal";
+        }
         public object searchForPayer(string query)
         {
-            return _context.TaxPayers.Where(x => x.Name.Contains(query) || x.Address.Contains(query) || x.PostalCode.ToString().Contains(query)).ToList();
+            return _context.TaxPayers.Where(x => x.Name.Contains(query) || x.Address.Contains(query) || x.PostalCode.Contains(query)).ToList();
         }
     }
 }
