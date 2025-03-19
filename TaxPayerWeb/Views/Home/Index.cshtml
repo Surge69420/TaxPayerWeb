@@ -1,0 +1,109 @@
+﻿@model List<Data.Models.TaxPayer>
+
+@{
+	ViewData["Title"] = "Home Page";
+}
+
+
+<form class="d-flex gap-5 my-4  w-100 justify-content-between"  onsubmit="GetData(this)" style="min-height:50px" >
+	<input style="width: 30vw;min-width:300px; " class="form-control me-2 rounded-3  border-secondary text-light" name="query" placeholder="Search" aria-label="Search">
+	<button style="width: 10vw; min-width:120px; " type="button" class="btn rounded-3 btn-primary " data-bs-toggle="modal" data-bs-target="#exampleModal">
+		New Payer
+	</button>
+</form>
+<!-- Button trigger modal -->
+<!-- Modal -->
+<div class="modal " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="exampleModalLabel">New Payer</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form asp-controller="Home" asp-action="CreateTable" method="post" id="form">
+					<div class="mb-3">
+						<label for="Name" class="form-label">Name</label>
+						<input name="Name" id="Name" class="form-control" required>
+					</div>
+					<div class="mb-3">
+						<label for="Address" class="form-label">Address</label>
+						<input name="Address" id="Address" class="form-control" required>
+					</div>
+					<div class="mb-3">
+						<label for="PostalCode" class="form-label">Postal Code</label>
+						<input name="PostalCode" id="PostalCode" class="form-control" type="number" required>
+					</div>
+				</form>
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+				<button form="form" type="submit" class="btn btn-primary">Submit</button>
+			</div>
+		</div>
+	</div>
+</div>
+<table class="table text-center table-striped">
+	<thead>
+		<tr>
+			<th scope="col">Tax Id</th>
+			<th scope="col">Name</th>
+			<th scope="col">Address</th>
+			<th scope="col">PostalCode</th>
+			<th scope="col"></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var taxPayer in Model)
+		{
+			<tr>
+				<th scope="row">@taxPayer.Id</th>
+				<td>@taxPayer.Name</td>
+				<td>@taxPayer.Address</td>
+				<td>@taxPayer.PostalCode</td>
+				<td><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="@("#" + taxPayer.Id + "modal")">Edit</button></td>
+				<div class="modal fade" id="@(taxPayer.Id+"modal")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h1 class="modal-title fs-5" id="@(taxPayer.Id+"Label")">Edit @taxPayer.Name</h1>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<form method="post" id="@(taxPayer.Id+"form")">
+									<div class="mb-3" style="display: none">
+										<label for="Id" class="form-label">Id</label>
+										<input name="Id" id="@(taxPayer.Id+"Id")" class="form-control" type="number" value="@taxPayer.Id" readonly>
+									</div>
+									<div class="mb-3">
+										<label for="Name" class="form-label">Name</label>
+										<input name="Name" id="@(taxPayer.Id+"Name")" class="form-control" value="@taxPayer.Name" required>
+									</div>
+									<div class="mb-3">
+										<label for="Address" class="form-label">Address</label>
+										<input name="Address" id="@(taxPayer.Id+"AddressEdit")" class="form-control" value="@taxPayer.Address" required>
+									</div>
+									<div class="mb-3">
+										<label for="PostalCode" class="form-label">Postal Code</label>
+										<input name="PostalCode" id="@(taxPayer.Id+"PostalCodeEdit")" class="form-control" type="number" value="@taxPayer.PostalCode" required>
+									</div>
+								</form>
+
+							</div>
+							<div class="modal-footer">
+								<button form="@(taxPayer.Id+"form")" formaction="/Home/DeleteTable" type="submit" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
+								<button form="@(taxPayer.Id+"form")" formaction="/Home/EditTable" type="submit" class="btn btn-primary">Submit</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</tr>
+
+		}
+	</tbody>
+</table>
+
+
+
+<script src="~/js/test.js" defer></script>
