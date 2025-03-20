@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Data.Models;
 using Data.Services;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
 namespace Data.Data
 {
-    public class ServerDbContext : DbContext
+    public class ServerDbContext : IdentityDbContext
     {
         public DbSet<TaxPayer> TaxPayers { get; set; }
         public DbSet<Cities> _Cities { get; set; }

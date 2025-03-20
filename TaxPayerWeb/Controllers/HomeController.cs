@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Data.Models;
+using TaxPayerWeb.Dtos;
 using Data.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaxPayerWeb.Models;
 
@@ -20,18 +22,24 @@ public class HomeController : Controller
         _db = db;
     }
 
+    [Authorize]
     public IActionResult Index(string query)
     {
-        var taxPayers = _db.queryDatabase();
+        Console.WriteLine(User.Identity.IsAuthenticated);
+            var taxPayers = _db.queryDatabase();
 
-        if (!string.IsNullOrEmpty(query))
-        {
-            taxPayers = taxPayers.Where(x => x.Name.Contains(query) || x.Address.Contains(query) || x.PostalCode.Contains(query)).ToList();
-        }
-        return View(taxPayers);
+            if (!string.IsNullOrEmpty(query))
+            {
+                taxPayers = taxPayers.Where(x => x.Name.Contains(query) || x.Address.Contains(query) || x.PostalCode.Contains(query)).ToList();
+            }
+            return View(taxPayers);
+       
     }
+
+
+
     [HttpPost]
-    public IActionResult CreateTable(TaxPayerFormModel taxPayer)
+    public IActionResult CreateTable(TaxPayerDto taxPayer)
     {
         MemoryStream ms = new MemoryStream();
         taxPayer.ImageData.CopyTo(ms);

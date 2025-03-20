@@ -1,6 +1,10 @@
 using Data.Data;
 using Data.Services;
-
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.UI;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 namespace TaxPayerWeb
 {
     public class Program
@@ -14,10 +18,42 @@ namespace TaxPayerWeb
 
             builder.Services.AddDbContext<ServerDbContext>();
             builder.Services.AddScoped<DbService>();
+            builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+                .AddEntityFrameworkStores<ServerDbContext>();
 
+            builder.Services.Configure<IdentityOptions>(options =>
+            {
+                // Password settings.
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequiredLength = 6;
+                options.Password.RequiredUniqueChars = 1;
 
+                // Lockout settings.
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
 
+                // User settings.
+                options.User.AllowedUserNameCharacters =
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                options.User.RequireUniqueEmail = false;
+            });
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                // Cookie settings
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromDays(200);
+
+                options.LoginPath = "/Auth";
+                options.AccessDeniedPath = "/Home/Error";
+                //options.SlidingExpiration = true;
+            });
 
             var app = builder.Build();
 
@@ -30,11 +66,16 @@ namespace TaxPayerWeb
             }
 
             app.UseHttpsRedirection();
+
+
             app.UseRouting();
 
+            app.MapStaticAssets();
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
-            app.MapStaticAssets();
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")

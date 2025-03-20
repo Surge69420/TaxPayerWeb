@@ -1,0 +1,107 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+	var errorMessage = (string)ViewData["ErrorMessage"];
+	var Login = ViewData["Login"] != null ? (bool)ViewData["Login"] : true;
+}
+
+@if(!String.IsNullOrEmpty(errorMessage))
+{
+	<div class="toast-container position-fixed  bottom-0 end-0 p-3">
+		<div id="liveToast" class="toast text-bg-danger" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-body">
+				@errorMessage
+			</div>
+		</div>
+	</div>
+}
+
+
+<div class="modal fade" id="Login" tabindex="-1" aria-labelledby="LoginLabel" aria-hidden="true" style="display: block; opacity: 1">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="LoginLabel">Login</h1>
+			</div>
+			<div class="modal-body">
+				<form asp-controller="Auth" asp-action="Login" enctype="multipart/form-data" method="post" id="form">
+					<div class="mb-3">
+						<label for="Email" class="form-label">Email</label>
+						<input type="email" name="Email" id="Email" class="form-control" placeholder="Enter your Email" required>
+					</div>
+					<div class="mb-3">
+						<label for="Password" class="form-label">Password</label>
+						<input type="Password" name="Password" id="Password" class="form-control" placeholder="Enter your Password.." required>
+					</div>
+				</form>
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary ModalToggle">Register</button>
+				<button form="form" type="submit" class="btn btn-primary">Login</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal fade " id="Register" tabindex="-1" aria-labelledby="RegisterLabel" aria-hidden="true" style="display: block; opacity: 1;">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="RegisterLabel">Register</h1>
+			</div>
+			<div class="modal-body">
+				<form asp-controller="Auth" asp-action="Register" enctype="multipart/form-data" method="post" id="formReg" class="CustomForms needs-validation" novalidate>
+
+					<div class="mb-3">
+						<label for="validationCustomUsername" class="form-label">Username</label>
+						<div class="input-group has-validation">
+							<span class="input-group-text" id="inputGroupPrepend">
+								@Html.Raw("@")
+							</span>
+							<input type="text" class="form-control" placeholder="Enter your Username..." id="validationCustomUsername" name="UserName" aria-describedby="inputGroupPrepend" required>
+							<div class="invalid-feedback">
+								Please choose a username.
+							</div>
+						</div>
+					</div>
+					<div class="mb-3">
+						<label for="validationCustomEmail" class="form-label">Email</label>
+						<input type="email" class="form-control" placeholder="Enter your Username..." id="validationCustomEmail" name="Email" aria-describedby="inputGroupPrepend" required>
+						<div class="invalid-feedback">
+							Please choose a Email.
+						</div>
+					</div>
+					<div class="mb-3">
+						<label for="PasswordReg" class="form-label">Password</label>
+						<input type="password" name="Password" id="PasswordReg" class="form-control" placeholder="Enter your Password.." required
+							   pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{6,}$"
+							   title="Password must be at least 6 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character (e.g., @Html.Raw("@"), #, $, %).">
+						<div class="invalid-feedback">
+							Password must be at least 6 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.
+						</div>
+					</div>
+
+
+				</form>
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary ModalToggle">Login</button>
+				<button form="formReg" type="submit" class="btn btn-primary">Register</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+<script type="text/javascript">
+	var login = @Login.ToString().ToLower();
+</script>
+
+
+<script src="~/js/site.js" defer></script>
