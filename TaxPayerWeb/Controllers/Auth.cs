@@ -1,16 +1,17 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TaxPayerWeb.Dtos;
+using Data.Models;
 namespace TaxPayerWeb.Controllers
 {
 
     public class Auth : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<Auth> _logger;
 
-        public Auth(UserManager<IdentityUser> userManager, ILogger<Auth> logger, SignInManager<IdentityUser> signInManger)
+        public Auth(UserManager<ApplicationUser> userManager, ILogger<Auth> logger, SignInManager<ApplicationUser> signInManger)
         {
             _userManager = userManager;
             _signInManager = signInManger;
@@ -80,7 +81,7 @@ namespace TaxPayerWeb.Controllers
                 return View("Index");
             }
 
-            var user = new IdentityUser { UserName = dto.UserName, Email = dto.Email };
+            var user = new ApplicationUser { UserName = dto.UserName, Email = dto.Email };
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (result.Succeeded)
             {

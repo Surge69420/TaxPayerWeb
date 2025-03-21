@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Data.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TaxPayerWeb.Controllers
@@ -6,11 +7,11 @@ namespace TaxPayerWeb.Controllers
 
     public class VerifyEmail : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<VerifyEmail> _logger;
 
-        public VerifyEmail(UserManager<IdentityUser> userManager, ILogger<VerifyEmail> logger, SignInManager<IdentityUser> signInManger)
+        public VerifyEmail(UserManager<ApplicationUser> userManager, ILogger<VerifyEmail> logger, SignInManager<ApplicationUser> signInManger)
         {
             _userManager = userManager;
             _signInManager = signInManger;

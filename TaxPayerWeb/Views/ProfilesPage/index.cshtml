@@ -1,38 +1,62 @@
-﻿
-@model Microsoft.AspNetCore.Identity.IdentityUser
+﻿@model Data.Models.ApplicationUser
 @*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
 }
-	<div class="modal fade" id="ResetPassword" tabindex="-1" aria-labelledby="ResetPasswordLabel" aria-hidden="true" style="display: block; opacity: 1">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h1 class="modal-title fs-5" id="ResetPasswordLabel">@Model.UserName Profile</h1>
+<div class="modal fade" id="ResetPassword" tabindex="-1" aria-labelledby="ResetPasswordLabel" aria-hidden="true" style="display: block; opacity: 1">
+	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content">
+			<div class="modal-header d-flex justify-content-between">
+				<h1 class="modal-title fs-5" id="ResetPasswordLabel">@Model.UserName Profile</h1>
+				<div>
+					@if (Model.ImageData != null)
+					{
+						<img style="height:10vh; width: 10vh; border-radius: 50%;" src="data:image/png;base64,@Convert.ToBase64String(Model.ImageData)
+																						" />
+					}
 				</div>
-				<div class="modal-body">
-					<fieldset disabled>
+			</div>
+			<div class="modal-body">
+				<fieldset disabled>
 					<div class="mb-3">
 						<label for="Email" class="form-label">Email</label>
 						<input type="email" name="Email" id="Email" class="form-control" placeholder="Enter your Email" value="@Model.Email" readonly>
 					</div>
-					</fieldset>
-					<form asp-controller="ProfilesPage" asp-action="ChangePass" enctype="multipart/form-data" method="post" id="form">
-						<div class="mb-3">
-							<label for="CurrentPassword" class="form-label">Current Password</label>
-							<input pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{6,}$" type="Password" name="CurrentPassword" id="CurrentPassword" class="form-control" placeholder="Enter your Password.." required>
-						</div>
-						<div class="mb-3">
-							<label for="NewPassword" class="form-label">New Password</label>
-							<input pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{6,}$" type="Password" name="NewPassword" id="NewPassword" class="form-control" placeholder="Enter your Password.." required>
+				</fieldset>
+				<form asp-controller="ProfilesPage" asp-action="ChangePass" enctype="multipart/form-data" method="post" id="form">
+					<div class="mb-3">
+						<label for="CurrentPassword" class="form-label">Current Password</label>
+						<input pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{6,}$" type="Password" name="CurrentPassword" id="CurrentPassword" class="form-control" placeholder="Enter your Password.." required>
+					</div>
+					<div class="mb-3">
+						<label for="NewPassword" class="form-label">New Password</label>
+						<input pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{6,}$" type="Password" name="NewPassword" id="NewPassword" class="form-control" placeholder="Enter your Password.." required>
 						<div class="mt-2 ms-1"><p><a class="link-opacity-100" href="/ResetPassword">Forgot Password?</a></p></div>
-						</div>
-					</form>
+					</div>
+				</form>
+				<hr />
+				<div style="display: flex; justify-content: end">
+					<button form="form" type="submit" class="btn btn-primary">Change Password</button>
 				</div>
-				<div class="modal-footer">
-					<button form="form" type="submit" class="btn btn-primary">Next</button>
+				<hr />
+				<form asp-controller="ProfilesPage" asp-action="ChangeProfile" enctype="multipart/form-data" method="post" id="formImg">
+					<div class="mb-3">
+						<label for="formFile" class="form-label">Change Profie Picture</label>
+						<input class="form-control" name="Img" type="file" id="formFile" required>
+					</div>
+				</form>
+				<div style="display: flex; justify-content: end">
+					<button form="formImg" type="submit" class="btn btn-primary">Change Profile</button>
 				</div>
+			</div>
+			<div class="modal-footer">
+				<form asp-controller="ProfilesPage" asp-action="SignOutUser" >
+					<button style="width: 10vw; min-width:120px; " type="submit" class="btn rounded-3 btn-primary ">
+						Sign Out
+					</button>
+				</form>
 			</div>
 		</div>
 	</div>
+</div>

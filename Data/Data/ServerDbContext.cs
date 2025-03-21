@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace Data.Data
 {
-    public class ServerDbContext : IdentityDbContext
+    public class ServerDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<TaxPayer> TaxPayers { get; set; }
         public DbSet<Cities> _Cities { get; set; }

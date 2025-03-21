@@ -13,9 +13,9 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly DbService _db;
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly SignInManager<IdentityUser> _signInManager;
-    public HomeController(ILogger<HomeController> logger, DbService db, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
+    public HomeController(ILogger<HomeController> logger, DbService db, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
     {
         _logger = logger;
         _db = db;
@@ -45,12 +45,7 @@ public class HomeController : Controller
 
     }
 
-    [HttpPost]
-    public async Task<IActionResult> SignOutUser()
-    {
-        await _signInManager.SignOutAsync();
-        return RedirectToAction("Index");
-    }
+
 
     [HttpPost]
     [Authorize]

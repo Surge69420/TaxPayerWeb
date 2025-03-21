@@ -1,4 +1,5 @@
 ﻿using System.Runtime.ConstrainedExecution;
+using Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TaxPayerWeb.Dtos;
@@ -8,9 +9,9 @@ namespace TaxPayerWeb.Controllers
     public class ResetPassword : Controller
     {
         private readonly ILogger<ResetPassword> _logger;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
-        public ResetPassword(ILogger<ResetPassword> logger, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        public ResetPassword(ILogger<ResetPassword> logger, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             _logger = logger;
             _userManager = userManager;
@@ -32,7 +33,7 @@ namespace TaxPayerWeb.Controllers
             }
             else
             {
-                IdentityUser? user = _userManager.FindByEmailAsync(email).Result;
+                ApplicationUser? user = _userManager.FindByEmailAsync(email).Result;
                 if (user != null)
                 {
                     return RedirectToAction("ResetPasswordPage", new { Email = email });
@@ -42,7 +43,7 @@ namespace TaxPayerWeb.Controllers
         }
         public async Task<IActionResult> ResetPasswordPage(string Email)
         {
-            IdentityUser? user = _userManager.FindByEmailAsync(Email).Result;
+            ApplicationUser? user = _userManager.FindByEmailAsync(Email).Result;
             if (string.IsNullOrEmpty(Email) || user == null)
             {
                 return RedirectToAction("Index");

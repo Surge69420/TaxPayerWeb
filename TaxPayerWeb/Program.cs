@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Data.Models;
 namespace TaxPayerWeb
 {
     public class Program
@@ -20,7 +21,7 @@ namespace TaxPayerWeb
             builder.Services.AddScoped<DbService>();
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ServerDbContext>();
 
             builder.Services.Configure<IdentityOptions>(options =>

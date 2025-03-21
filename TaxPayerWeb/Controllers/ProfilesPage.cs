@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Data.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TaxPayerWeb.Dtos;
 
@@ -7,11 +8,11 @@ namespace TaxPayerWeb.Controllers
 
     public class ProfilesPage : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<Auth> _logger;
 
-        public ProfilesPage(UserManager<IdentityUser> userManager, ILogger<Auth> logger, SignInManager<IdentityUser> signInManger)
+        public ProfilesPage(UserManager<ApplicationUser> userManager, ILogger<Auth> logger, SignInManager<ApplicationUser> signInManger)
         {
             _userManager = userManager;
             _signInManager = signInManger;
@@ -19,7 +20,7 @@ namespace TaxPayerWeb.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            IdentityUser? user = await _userManager.GetUserAsync(User);
+            ApplicationUser? user = await _userManager.GetUserAsync(User);
             if(user == null)
             {
                 return RedirectToAction("Index", "Auth");
@@ -28,7 +29,7 @@ namespace TaxPayerWeb.Controllers
         }
         public async Task<IActionResult> ChangePass(ChangePassDto changePassDto)
         {
-            IdentityUser? user = await _userManager.GetUserAsync(User);
+            ApplicationUser? user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return View();
@@ -38,6 +39,34 @@ namespace TaxPayerWeb.Controllers
                 await _userManager.ChangePasswordAsync(user, changePassDto.CurrentPassword, changePassDto.NewPassword);
                 return RedirectToAction("Index", "Home");
             }
+        }
+        public async Task<IActionResult> ChangeProfile(IFormFile Img)
+        {
+            ApplicationUser? user = await _userManager.GetUserAsync(User);
+            if(user == null)
+            {
+                _logger.LogError("no user");
+            }
+            _logger.LogInformation("Yes user");
+            MemoryStream ms = new MemoryStream();
+            Img.CopyTo(ms);
+            user.ImageData = ms.ToArray();
+            ms.Close();
+            ms.Dispose();
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                // You can add a success message or redirect
+                _logger.LogInformation("WORKED");
+            }
+            return RedirectToAction("Index");
+        }
+        [HttpPost]
+        public async Task<IActionResult> SignOutUser()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index");
         }
     }
 }

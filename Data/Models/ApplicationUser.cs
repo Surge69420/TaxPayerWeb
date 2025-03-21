@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Data.Models
 {
-    public class Users : IdentityUser
+    public class ApplicationUser : IdentityUser
     {
         public byte[]? ImageData { get; set; }
     }
