@@ -4,18 +4,23 @@
 	ViewData["Title"] = "Home Page";
 }
 
+<div class="d-flex gap-5 my-4  w-100 justify-content-between align-items-center">
+	<form onsubmit="GetData(this)" style="min-height:50px">
+		<input style="width: 30vw;min-width:300px; " class="form-control me-2 rounded-3  border-secondary text-light" name="query" placeholder="Search" aria-label="Search">
+	</form>
+	<div class="d-flex gap-2 justify-content-center align-items-center">
+		<button style="width: 10vw; min-width:120px; " type="button" class="btn rounded-3 btn-primary " data-bs-toggle="modal" data-bs-target="#exampleModal">
+			New Payer
+		</button>
 
-<form class="d-flex gap-5 my-4  w-100 justify-content-between" onsubmit="GetData(this)" style="min-height:50px">
-	<input style="width: 30vw;min-width:300px; " class="form-control me-2 rounded-3  border-secondary text-light" name="query" placeholder="Search" aria-label="Search">
-	<button style="width: 10vw; min-width:120px; " type="button" class="btn rounded-3 btn-primary " data-bs-toggle="modal" data-bs-target="#exampleModal">
-		New Payer
-	</button>
-</form>
-<form asp-controller="Home" asp-action="SignOutUser" class="d-flex gap-5 my-4  w-100 justify-content-between" style="min-height:50px">
-	<button style="width: 10vw; min-width:120px; " type="submit" class="btn rounded-3 btn-primary ">
-		Sign Out
-	</button>
-</form>
+		<button class="btn btn-primary" type="button" onclick="window.location.href='/ProfilesPage'" style="width: 10vw; min-width:120px; height: fit-content">Profile</button>
+		<form asp-controller="Home" asp-action="SignOutUser" class="d-flex gap-5 my-4  w-100 justify-content-between" style="min-height:50px">
+			<button style="width: 10vw; min-width:120px; " type="submit" class="btn rounded-3 btn-primary ">
+				Sign Out
+			</button>
+		</form>
+	</div>
+</div>
 <!-- Butto
 <!-- Button trigger modal -->
 <!-- Modal -->
@@ -75,7 +80,7 @@
 				{
 					<td valign="middle">
 						<img src="data:image/png;base64,@Convert.ToBase64String(taxPayer.ImageData)
-								" />
+														" />
 					</td>
 				}
 				@if (taxPayer.CityName == null)
