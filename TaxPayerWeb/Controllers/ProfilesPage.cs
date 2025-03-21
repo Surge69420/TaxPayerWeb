@@ -4,20 +4,27 @@ using TaxPayerWeb.Dtos;
 
 namespace TaxPayerWeb.Controllers
 {
-    public class ChangePassword : Controller
+
+    public class ProfilesPage : Controller
     {
-        private readonly ILogger<ResetPassword> _logger;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
-        public ChangePassword(ILogger<ResetPassword> logger, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        private readonly ILogger<Auth> _logger;
+
+        public ProfilesPage(UserManager<IdentityUser> userManager, ILogger<Auth> logger, SignInManager<IdentityUser> signInManger)
         {
-            _logger = logger;
             _userManager = userManager;
-            _signInManager = signInManager;
+            _signInManager = signInManger;
+            _logger = logger;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            IdentityUser? user = await _userManager.GetUserAsync(User);
+            if(user == null)
+            {
+                return RedirectToAction("Index", "Auth");
+            }
+            return View(user);
         }
         public async Task<IActionResult> ChangePass(ChangePassDto changePassDto)
         {
