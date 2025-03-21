@@ -1,11 +1,11 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Data.Models;
-using TaxPayerWeb.Dtos;
 using Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaxPayerWeb.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace TaxPayerWeb.Controllers;
 
@@ -13,34 +13,56 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly DbService _db;
-
-
-
-    public HomeController(ILogger<HomeController> logger, DbService db)
+    private readonly UserManager<IdentityUser> _userManager;
+    private readonly SignInManager<IdentityUser> _signInManager;
+    public HomeController(ILogger<HomeController> logger, DbService db, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
     {
         _logger = logger;
         _db = db;
+        _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     [Authorize]
-    public IActionResult Index(string query)
+    public async Task<IActionResult> Index(string query)
     {
-        Console.WriteLine(User.Identity.IsAuthenticated);
-            var taxPayers = _db.queryDatabase();
+        var user = await _userManager.GetUserAsync(User);
 
-            if (!string.IsNullOrEmpty(query))
-            {
-                taxPayers = taxPayers.Where(x => x.Name.Contains(query) || x.Address.Contains(query) || x.PostalCode.Contains(query)).ToList();
-            }
-            return View(taxPayers);
-       
+        if (user != null && !user.EmailConfirmed)
+        {
+            // If email is not confirmed, redirect them to the login page or another page
+            return RedirectToAction("Index", "Auth");
+        }
+
+        Console.WriteLine(User?.Identity?.IsAuthenticated);
+        var taxPayers = _db.queryDatabase();
+
+        if (!string.IsNullOrEmpty(query))
+        {
+            taxPayers = taxPayers.Where(x => (x.Name?.Contains(query) ?? false) || (x.Address?.Contains(query) ?? false) || (x.PostalCode?.Contains(query) ?? false)).ToList();
+        }
+        return View(taxPayers);
+
     }
 
-
+    [HttpPost]
+    public async Task<IActionResult> SignOutUser()
+    {
+        await _signInManager.SignOutAsync();
+        return RedirectToAction("Index");
+    }
 
     [HttpPost]
-    public IActionResult CreateTable(TaxPayerDto taxPayer)
+    [Authorize]
+    public async Task<IActionResult> CreateTable(Dtos.TaxPayerDto taxPayer)
     {
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user != null && !user.EmailConfirmed)
+        {
+            // If email is not confirmed, redirect them to the login page or another page
+            return RedirectToAction("Index", "Auth");
+        }
         MemoryStream ms = new MemoryStream();
         taxPayer.ImageData.CopyTo(ms);
         string pcodeNum = Regex.Match(taxPayer.PostalCode.Trim(), @"^\d+").ToString();
@@ -60,8 +82,16 @@ public class HomeController : Controller
         return RedirectToAction("Index");
     }
     [HttpPost]
-    public IActionResult EditTable(Data.Models.TaxPayer taxPayer)
+    [Authorize]
+    public async Task<IActionResult> EditTable(Data.Models.TaxPayer taxPayer)
     {
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user != null && !user.EmailConfirmed || String.IsNullOrEmpty(taxPayer.PostalCode))
+        {
+            // If email is not confirmed, redirect them to the login page or another page
+            return RedirectToAction("Index", "Auth");
+        }
         string pcodeNum = Regex.Match(taxPayer.PostalCode.Trim(), @"^\d+").ToString();
         taxPayer.CityName = _db.GetCity(Convert.ToInt32(pcodeNum));
         var result = _db.UpdateTable(taxPayer);
@@ -69,8 +99,16 @@ public class HomeController : Controller
         return RedirectToAction("Index");
     }
     [HttpPost]
-    public IActionResult DeleteTable(Data.Models.TaxPayer taxPayer)
+    [Authorize]
+    public async Task<IActionResult> DeleteTable(Data.Models.TaxPayer taxPayer)
     {
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user != null && !user.EmailConfirmed)
+        {
+            // If email is not confirmed, redirect them to the login page or another page
+            return RedirectToAction("Index", "Auth");
+        }
         var result = _db.DeleteTable(taxPayer);
         Console.WriteLine(result);
         return RedirectToAction("Index");

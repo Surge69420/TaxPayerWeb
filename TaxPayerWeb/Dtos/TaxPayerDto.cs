@@ -3,20 +3,32 @@ namespace TaxPayerWeb.Dtos
 {
     public class TaxPayerDto
     {
-        public string Name { get; set; }
-        public string Address { get; set; }
-        public string PostalCode { get; set; }
-        public IFormFile ImageData { get; set; }
+        public required string Name { get; set; }
+        public required string Address { get; set; }
+        public required string PostalCode { get; set; }
+        public required IFormFile ImageData { get; set; }
     }
     public class LoginDto()
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public required string Email { get; set; }
+        public required string Password { get; set; }
     }
     public class RegisterDto()
     {
-        public string UserName { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public required string UserName { get; set; }
+        public required string Email { get; set; }
+        public required string Password { get; set; }
+    }
+    public class ResetPassDto
+    {
+        public required string Email { get; set; }
+        public required string Password { get; set; }
+
+        public required string Token { get; set; }
+    }
+    public class ChangePassDto
+    {
+        public required string NewPassword { get; set; }
+        public required string CurrentPassword { get; set; }
     }
 }

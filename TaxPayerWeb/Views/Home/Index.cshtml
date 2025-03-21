@@ -11,6 +11,12 @@
 		New Payer
 	</button>
 </form>
+<form asp-controller="Home" asp-action="SignOutUser" class="d-flex gap-5 my-4  w-100 justify-content-between" style="min-height:50px">
+	<button style="width: 10vw; min-width:120px; " type="submit" class="btn rounded-3 btn-primary ">
+		Sign Out
+	</button>
+</form>
+<!-- Butto
 <!-- Button trigger modal -->
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -65,7 +71,13 @@
 				<td valign="middle">@taxPayer.Name</td>
 				<td valign="middle">@taxPayer.Address</td>
 				<td valign="middle">@taxPayer.PostalCode</td>
-				<td valign="middle"><img src="data:image/png;base64,@Convert.ToBase64String(taxPayer.ImageData)" /></td>
+				@if (taxPayer.ImageData != null)
+				{
+					<td valign="middle">
+						<img src="data:image/png;base64,@Convert.ToBase64String(taxPayer.ImageData)
+								" />
+					</td>
+				}
 				@if (taxPayer.CityName == null)
 				{
 					<td valign="middle">Portugal</td>
@@ -75,41 +87,43 @@
 					<td valign="middle">@taxPayer.CityName</td>
 				}
 				<td><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="@("#" + taxPayer.Id + "modal")">Edit</button></td>
-				<div class="modal fade" id="@(taxPayer.Id+"modal")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-					<div class="modal-dialog modal-dialog-centered">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h1 class="modal-title fs-5" id="@(taxPayer.Id+"Label")">Edit @taxPayer.Name</h1>
-								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-							</div>
-							<div class="modal-body">
-								<form method="post" id="@(taxPayer.Id+"form")">
-									<div class="mb-3" style="display: none">
-										<label for="Id" class="form-label">Id</label>
-										<input name="Id" id="@(taxPayer.Id+"Id")" class="form-control" type="number" value="@taxPayer.Id" readonly>
-									</div>
-									<div class="mb-3">
-										<label for="Name" class="form-label">Name</label>
-										<input name="Name" id="@(taxPayer.Id+"Name")" class="form-control" value="@taxPayer.Name" required>
-									</div>
-									<div class="mb-3">
-										<label for="Address" class="form-label">Address</label>
-										<input name="Address" id="@(taxPayer.Id+"AddressEdit")" class="form-control" value="@taxPayer.Address" required>
-									</div>
-									<div class="mb-3">
-										<label for="PostalCode" class="form-label">Postal Code</label>
-										<input name="PostalCode" pattern="^\d{4}-\d{3}$" id="@(taxPayer.Id+"PostalCodeEdit")" class="form-control" type="text" value="@taxPayer.PostalCode" required>
-									</div>
-								</form>
+				<td>
+					<div class="modal fade text-start" id="@(taxPayer.Id+"modal")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+						<div class="modal-dialog modal-dialog-centered">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h1 class="modal-title fs-5" id="@(taxPayer.Id+"Label")">Edit @taxPayer.Name</h1>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<form method="post" id="@(taxPayer.Id+"form")">
+										<div class="mb-3" style="display: none">
+											<label for="Id" class="form-label">Id</label>
+											<input name="Id" id="@(taxPayer.Id+"Id")" class="form-control" type="number" value="@taxPayer.Id" readonly>
+										</div>
+										<div class="mb-3">
+											<label for="Name" class="form-label">Name</label>
+											<input name="Name" id="@(taxPayer.Id+"Name")" class="form-control" value="@taxPayer.Name" required>
+										</div>
+										<div class="mb-3">
+											<label for="Address" class="form-label">Address</label>
+											<input name="Address" id="@(taxPayer.Id+"AddressEdit")" class="form-control" value="@taxPayer.Address" required>
+										</div>
+										<div class="mb-3">
+											<label for="PostalCode" class="form-label">Postal Code</label>
+											<input name="PostalCode" pattern="^\d{4}-\d{3}$" id="@(taxPayer.Id+"PostalCodeEdit")" class="form-control" type="text" value="@taxPayer.PostalCode" required>
+										</div>
+									</form>
 
-							</div>
-							<div class="modal-footer">
-								<button form="@(taxPayer.Id+"form")" formaction="/Home/DeleteTable" type="submit" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
-								<button form="@(taxPayer.Id+"form")" formaction="/Home/EditTable" type="submit" class="btn btn-primary">Submit</button>
+								</div>
+								<div class="modal-footer">
+									<button form="@(taxPayer.Id+"form")" formaction="/Home/DeleteTable" type="submit" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
+									<button form="@(taxPayer.Id+"form")" formaction="/Home/EditTable" type="submit" class="btn btn-primary">Submit</button>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
+				</td>
 			</tr>
 
 		}

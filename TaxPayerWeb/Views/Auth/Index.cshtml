@@ -2,11 +2,11 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
-	var errorMessage = (string)ViewData["ErrorMessage"];
-	var Login = ViewData["Login"] != null ? (bool)ViewData["Login"] : true;
+	string? errorMessage = (string?)ViewData["ErrorMessage"] != null ? (string?)ViewData["ErrorMessage"] : "";
+	bool? Login = ViewData["Login"] != null ? (bool?)ViewData["Login"] : true;
 }
 
-@if(!String.IsNullOrEmpty(errorMessage))
+@if (!String.IsNullOrEmpty(errorMessage))
 {
 	<div class="toast-container position-fixed  bottom-0 end-0 p-3">
 		<div id="liveToast" class="toast text-bg-danger" role="alert" aria-live="assertive" aria-atomic="true">
@@ -32,7 +32,8 @@
 					</div>
 					<div class="mb-3">
 						<label for="Password" class="form-label">Password</label>
-						<input type="Password" name="Password" id="Password" class="form-control" placeholder="Enter your Password.." required>
+						<input pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{6,}$" type="Password" name="Password" id="Password" class="form-control" placeholder="Enter your Password.." required>
+						<div class="mt-2 ms-1"><p><a class="link-opacity-100" href="/ResetPassword">Forgot Password?</a></p></div>
 					</div>
 				</form>
 
@@ -99,9 +100,8 @@
 
 
 
+
 <script type="text/javascript">
-	var login = @Login.ToString().ToLower();
+	var login = '@Html.Raw(Json.Serialize(Login?.ToString().ToLower()))';
 </script>
 
-
-<script src="~/js/site.js" defer></script>

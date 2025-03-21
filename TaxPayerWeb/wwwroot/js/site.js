@@ -1,32 +1,39 @@
-﻿
-document.querySelectorAll(".ModalToggle").forEach(function (toggleButton) {
-    toggleButton.addEventListener("click", function (event) {
-        event.stopPropagation(); 
+﻿$(function () {
+    const $register = $("#Register");
+    const $login = $("#Login");
 
-        alert("click");
-        const register = document.querySelector("#Register");
-        const login = document.querySelector("#Login");
+    // Assuming 'login' is a boolean variable that determines which form to show
+    if (login) {
+        // Show the Login form, hide Register form
+        $register.css("display", "none");
+        $login.css("display", "block");
+    } else {
+        // Show the Register form, hide Login form
+        $register.css("display", "block");
+        $login.css("display", "none");
+    }
+    $(".ModalToggle").on("click", function (event) {
+        event.stopPropagation(); // Prevent event bubbling
+        // Get current display values
+        var registerDisplay = $register.css("display");
+        var loginDisplay = $login.css("display");
 
-        var swapVal = login.style.display;
-        login.style.display = register.style.display;
-        register.style.display = swapVal;
+        // Swap the display values: one should be block, the other should be none
+        if (registerDisplay === "none") {
+            $register.css("display", "block");
+            $login.css("display", "none");
+        } else {
+            $register.css("display", "none");
+            $login.css("display", "block");
+        }
 
-        console.log(register.classList);
+        // Log to verify the changes
+        console.log("Register display: " + $register.css("display"));
+        console.log("Login display: " + $login.css("display"));
     });
 });
-var toastEl = document.getElementById('liveToast');
-var toast = new bootstrap.Toast(toastEl);
-toast.show();
 
 (function () {
-    'use strict';
-		if (login) {
-			document.querySelector("#Register").style.display = "none";
-			document.querySelector("#Login").style.display = "block";
-		} else {
-			document.querySelector("#Login").style.display = "none";
-			document.querySelector("#Register").style.display = "block";
-		}
     var forms = document.querySelectorAll('.needs-validation');
     Array.prototype.slice.call(forms)
         .forEach(function (form) {
@@ -40,3 +47,7 @@ toast.show();
             }, false);
         });
 })();
+
+var toastEl = document.getElementById('liveToast');
+var toast = new bootstrap.Toast(toastEl);
+toast.show();

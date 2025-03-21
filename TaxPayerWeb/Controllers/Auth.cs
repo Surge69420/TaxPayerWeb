@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TaxPayerWeb.Dtos;
 namespace TaxPayerWeb.Controllers
@@ -21,20 +20,16 @@ namespace TaxPayerWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            if(User.Identity.IsAuthenticated)
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user != null && !user.EmailConfirmed)
             {
-                return RedirectToAction("Index", "Home");
+                var VerToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                return RedirectToAction("Index", "VerifyEmail", new { VerificationToken = VerToken });
             }
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Index(LoginDto dto)
-        {
-          
-            
-            return View();
-        }
 
 
         [HttpPost]
@@ -44,7 +39,7 @@ namespace TaxPayerWeb.Controllers
             if (user == null)
             {
                 ViewData["ErrorMessage"] = "Invalid password or user";
-                
+
                 return View("Index");
             }
             else
@@ -52,7 +47,12 @@ namespace TaxPayerWeb.Controllers
                 var signInResult = await _signInManager.PasswordSignInAsync(user, dto.Password, true, lockoutOnFailure: false);
                 if (signInResult.Succeeded)
                 {
-                    return RedirectToAction("Index", "Home");
+                    if (!user.EmailConfirmed)
+                    {
+                        var VerToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        return RedirectToAction("Index", "VerifyEmail", new { VerificationToken = VerToken });
+                    }
+                    return RedirectToAction("Index", "VerifyEmail");
                 }
                 else
                 {
@@ -89,7 +89,8 @@ namespace TaxPayerWeb.Controllers
                 {
                     await _signInManager.SignInAsync(user, isPersistent: true);
                     _logger.LogInformation("User signed in successfully: {UserName}", user.UserName);
-                    return RedirectToAction("Index", "Home");
+                    var VerToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    return RedirectToAction("Index", "VerifyEmail", new { VerificationToken = VerToken });
 
                 }
                 catch (Exception ex)
@@ -102,64 +103,6 @@ namespace TaxPayerWeb.Controllers
             {
                 return View("Index");
             }
-
-
-        }
-
-
-        public async Task<IActionResult> Logins()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            var existingUser = await _userManager.FindByNameAsync("adadl");
-
-            // If the user is already logged in, you can either skip creating the user or redirect them
-            if (User.Identity.IsAuthenticated && user != null)
-            {
-                _logger.LogError(User.Identity.Name);
-                _logger.LogError("Redirecting");
-                // Redirect to another page or show a message since the user is already logged in
-                return RedirectToAction("Index", "Home");
-            }
-            else if (existingUser != null)
-            {
-
-
-                var signInResult = await _signInManager.PasswordSignInAsync("adadl",
-               "Uz004@23", true,
-             lockoutOnFailure: false);
-                _logger.LogError("Password Sign In");
-
-                _logger.LogError(JsonSerializer.Serialize(signInResult));
-                return RedirectToAction("Index", "Home");
-            }
-            _logger.LogInformation("Index action called.");
-
-            user = new IdentityUser { UserName = "adadl", Email = "adadada@gmail.com" };
-            _logger.LogInformation("Creating user with username: {UserName} and email: {Email}", user.UserName, user.Email);
-
-            var result = await _userManager.CreateAsync(user, "Uz004@23");
-            if (result.Succeeded)
-            {
-                _logger.LogInformation("User created successfully. Signing in user: {UserName}", user.UserName);
-                try
-                {
-                    await _signInManager.SignInAsync(user, isPersistent: true);
-                    _logger.LogInformation("User signed in successfully: {UserName}", user.UserName);
-                    return LocalRedirect("/Home/Index");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error signing in user: {UserName}", user.UserName);
-                }
-            }
-
-            foreach (var error in result.Errors)
-            {
-                _logger.LogError("Error creating user: {Code} - {Description}", error.Code, error.Description);
-            }
-
-            _logger.LogInformation("Returning view due to user creation failure.");
-            return Ok("FAILURE");
         }
     }
 }
