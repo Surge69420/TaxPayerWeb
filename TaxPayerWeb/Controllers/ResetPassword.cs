@@ -29,7 +29,7 @@ namespace TaxPayerWeb.Controllers
             _logger.LogInformation(email);
             if (email == null)
             {
-                return RedirectToAction("Index");
+                ViewData["ErrorMessage"] = "User does not exist";
             }
             else
             {
@@ -38,15 +38,20 @@ namespace TaxPayerWeb.Controllers
                 {
                     return RedirectToAction("ResetPasswordPage", new { Email = email });
                 }
+                else
+                {
+                    ViewData["ErrorMessage"] = "User does not exist";
+                }
             }
-            return RedirectToAction("Index");
+            ViewData["ErrorMessage"] = "User does not exist";
+            return View("index");
         }
         public async Task<IActionResult> ResetPasswordPage(string Email)
         {
             ApplicationUser? user = _userManager.FindByEmailAsync(Email).Result;
             if (string.IsNullOrEmpty(Email) || user == null)
             {
-                return RedirectToAction("Index");
+                ViewData["ErrorMessage"] = "User does not exist";
             }
             else
             {
@@ -55,6 +60,7 @@ namespace TaxPayerWeb.Controllers
                 ViewData["Token"] = Token;
                 return View();
             }
+            return View("index");
         }
         [HttpPost]
         public async Task<IActionResult> ResetPasswordPost(ResetPassDto resetPassDto)
@@ -63,20 +69,28 @@ namespace TaxPayerWeb.Controllers
             if (user != null)
             {
                 var res = await _userManager.ResetPasswordAsync(user, resetPassDto.Token, resetPassDto.Password);
-                if (res.Succeeded) {
+                if (res.Succeeded)
+                {
                     return RedirectToAction("Index", "Auth");
-                    }
+                }
                 else
                 {
+                    var errorcodes = "";
                     foreach (var error in res.Errors)
                     {
                         _logger.LogError("Pass Reset failed: {Code} - {Description}", error.Code, error.Description);
+                        errorcodes += error.Code + "" + error.Description;
 
                     }
+                    ViewData["ErrorMessage"] = "Password Reset Failed " + errorcodes;
                     return RedirectToAction("Index");
                 }
             }
-            else { return RedirectToAction("Index"); }
+            else
+            {
+                ViewData["ErrorMessage"] = "User does not exist";
+            }
+            return RedirectToAction("Index");
         }
     }
 }

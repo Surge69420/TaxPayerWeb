@@ -3,6 +3,17 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
+	string? errorMessage = (string?)ViewData["ErrorMessage"] != null ? (string?)ViewData["ErrorMessage"] : "";
+}
+@if (!String.IsNullOrEmpty(errorMessage))
+{
+	<div class="toast-container position-fixed  bottom-0 end-0 p-3">
+		<div id="liveToast" class="toast text-bg-danger" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-body">
+				@errorMessage
+			</div>
+		</div>
+	</div>
 }
 <div class="modal fade" id="ResetPassword" tabindex="-1" aria-labelledby="ResetPasswordLabel" aria-hidden="true" style="display: block; opacity: 1">
 	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -13,7 +24,7 @@
 					@if (Model.ImageData != null)
 					{
 						<img style="height:10vh; width: 10vh; border-radius: 50%;" src="data:image/png;base64,@Convert.ToBase64String(Model.ImageData)
-																						" />
+																							" />
 					}
 				</div>
 			</div>
@@ -51,7 +62,7 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<form asp-controller="ProfilesPage" asp-action="SignOutUser" >
+				<form asp-controller="ProfilesPage" asp-action="SignOutUser">
 					<button style="width: 10vw; min-width:120px; " type="submit" class="btn rounded-3 btn-primary ">
 						Sign Out
 					</button>
