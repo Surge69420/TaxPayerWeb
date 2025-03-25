@@ -6,7 +6,19 @@ namespace TaxPayerWeb.Dtos
         public required string Name { get; set; }
         public required string Address { get; set; }
         public required string PostalCode { get; set; }
+        public required int VAT { get; set; }
         public required IFormFile ImageData { get; set; }
+    }
+    public class TaxPayerEditDto
+    {
+        public int Id { get; set; }
+        public required string Name { get; set; }
+        public required string Address { get; set; }
+        public required string PostalCode { get; set; }
+        public required int VAT { get; set; }
+        public string? CityName { get; set; }
+        public required IFormFile ImageData { get; set; }
+        public string? dummyImg { get; set; }
     }
     public class LoginDto()
     {

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using TaxPayerWeb.Models;
 using Microsoft.AspNetCore.Identity;
 using TaxPayerWeb.Constants;
+using TaxPayerWeb.Dtos;
 
 namespace TaxPayerWeb.Controllers;
 
@@ -57,11 +58,11 @@ public class HomeController : Controller
 
 
     [HttpPost]
-    [Authorize(Roles = RoleConstants.SuperAdmin)]
+    [Authorize]
     public async Task<IActionResult> CreateTable(Dtos.TaxPayerDto taxPayer)
     {
         var user = await _userManager.GetUserAsync(User);
-        if (user != null && !user.EmailConfirmed)
+        if (user != null && !user.EmailConfirmed && await _userManager.IsInRoleAsync(user, RoleConstants.SuperAdmin))
         {
             // If email is not confirmed, redirect them to the login page or another page
             return RedirectToAction("Index", "Auth");
@@ -76,6 +77,7 @@ public class HomeController : Controller
             Address = taxPayer.Address,
             PostalCode = taxPayer.PostalCode,
             CityName = city,
+            VAT = taxPayer.VAT,
             ImageData = ms.ToArray()
         };
         ms.Close();
@@ -85,29 +87,53 @@ public class HomeController : Controller
         return RedirectToAction("Index");
     }
     [HttpPost]
-    [Authorize(Roles = RoleConstants.SuperAdmin)]
-    public async Task<IActionResult> EditTable(Data.Models.TaxPayer taxPayer)
+    [Authorize]
+    public async Task<IActionResult> EditTable(TaxPayerEditDto taxPayer)
     {
         var user = await _userManager.GetUserAsync(User);
 
-        if (user != null && !user.EmailConfirmed || String.IsNullOrEmpty(taxPayer.PostalCode))
+        if (user != null && !user.EmailConfirmed && !await _userManager.IsInRoleAsync(user, RoleConstants.SuperAdmin) || String.IsNullOrEmpty(taxPayer.PostalCode))
         {
             // If email is not confirmed, redirect them to the login page or another page
             return RedirectToAction("Index", "Auth");
         }
+
+
+        var taxp = new TaxPayer
+        {
+            Id = taxPayer.Id,
+            Name = taxPayer.Name,
+            Address = taxPayer.Address,
+            PostalCode = taxPayer.PostalCode,
+            VAT = taxPayer.VAT
+        };
+        if (taxPayer.ImageData != null)
+        {
+            MemoryStream ms = new MemoryStream();
+            taxPayer.ImageData.CopyTo(ms);
+            _logger.LogInformation("IMGDATA   " + ms.ToArray());
+            taxp.ImageData = ms.ToArray();
+            ms.Close();
+            ms.Dispose();
+        }
+        else
+        {
+            taxp.ImageData = Convert.FromBase64String(taxPayer.dummyImg);
+        }
+
         string pcodeNum = Regex.Match(taxPayer.PostalCode.Trim(), @"^\d+").ToString();
-        taxPayer.CityName = _db.GetCity(Convert.ToInt32(pcodeNum));
-        var result = _db.UpdateTable(taxPayer);
+        taxp.CityName = _db.GetCity(Convert.ToInt32(pcodeNum));
+        var result = _db.UpdateTable(taxp);
         Console.WriteLine(result);
         return RedirectToAction("Index");
     }
     [HttpPost]
-    [Authorize(Roles = RoleConstants.SuperAdmin)]
+    [Authorize]
     public async Task<IActionResult> DeleteTable(Data.Models.TaxPayer taxPayer)
     {
         var user = await _userManager.GetUserAsync(User);
 
-        if (user != null && !user.EmailConfirmed)
+        if (user != null && !user.EmailConfirmed && await _userManager.IsInRoleAsync(user, RoleConstants.SuperAdmin))
         {
             // If email is not confirmed, redirect them to the login page or another page
             return RedirectToAction("Index", "Auth");

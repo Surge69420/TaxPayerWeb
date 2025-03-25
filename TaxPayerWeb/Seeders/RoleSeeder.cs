@@ -28,7 +28,7 @@ namespace TaxPayerWeb.Seeders
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var role = RoleConstants.Admin;
             var users = await userManager.Users.ToListAsync();
-            foreach (ApplicationUser user in users)
+            foreach (ApplicationUser user in userManager.Users)
             {
                 if (user.EmailConfirmed)
                 {
