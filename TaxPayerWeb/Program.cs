@@ -6,11 +6,14 @@ using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Data.Models;
+using System.Threading.Tasks;
+using TaxPayerWeb.Seeders;
+using Microsoft.Extensions.DependencyInjection;
 namespace TaxPayerWeb
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -21,8 +24,9 @@ namespace TaxPayerWeb
             builder.Services.AddScoped<DbService>();
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ServerDbContext>();
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedEmail = true)
+                .AddEntityFrameworkStores<ServerDbContext>()
+                .AddDefaultTokenProviders();
 
             builder.Services.Configure<IdentityOptions>(options =>
             {
@@ -57,7 +61,16 @@ namespace TaxPayerWeb
             });
 
             var app = builder.Build();
+            using (var scope = app.Services.CreateScope())
+            {
+                var serviceProvider = scope.ServiceProvider;
+                var dbContext = serviceProvider.GetRequiredService<ServerDbContext>();
 
+                // Apply pending migrations
+                await dbContext.Database.MigrateAsync();
+                await RoleSeeder.SeedRoles(serviceProvider);
+
+            }
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {

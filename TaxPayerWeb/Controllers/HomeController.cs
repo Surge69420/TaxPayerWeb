@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaxPayerWeb.Models;
 using Microsoft.AspNetCore.Identity;
+using TaxPayerWeb.Constants;
 
 namespace TaxPayerWeb.Controllers;
 
@@ -28,31 +29,38 @@ public class HomeController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
 
-        if (user != null && !user.EmailConfirmed)
+        if (user != null && user.EmailConfirmed)
         {
-            // If email is not confirmed, redirect them to the login page or another page
-            return RedirectToAction("Index", "Auth");
+            var roles = await _userManager.GetRolesAsync(user);
+            _logger.LogInformation("ROLES: " + string.Join(", ", roles));
+            if (await _userManager.IsInRoleAsync(user, RoleConstants.SuperAdmin))
+            {
+                ViewData["IsSuperAdmin"] = true;
+            }
+            else
+            {
+                ViewData["IsSuperAdmin"] = false;
+            }
+
+            Console.WriteLine(User?.Identity?.IsAuthenticated);
+            var taxPayers = _db.queryDatabase();
+
+            if (!string.IsNullOrEmpty(query))
+            {
+                taxPayers = taxPayers.Where(x => (x.Name?.Contains(query) ?? false) || (x.Address?.Contains(query) ?? false) || (x.PostalCode?.Contains(query) ?? false)).ToList();
+            }
+            return View(taxPayers);
         }
-
-        Console.WriteLine(User?.Identity?.IsAuthenticated);
-        var taxPayers = _db.queryDatabase();
-
-        if (!string.IsNullOrEmpty(query))
-        {
-            taxPayers = taxPayers.Where(x => (x.Name?.Contains(query) ?? false) || (x.Address?.Contains(query) ?? false) || (x.PostalCode?.Contains(query) ?? false)).ToList();
-        }
-        return View(taxPayers);
-
+        return RedirectToAction("Index", "Auth");
     }
 
 
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = RoleConstants.SuperAdmin)]
     public async Task<IActionResult> CreateTable(Dtos.TaxPayerDto taxPayer)
     {
         var user = await _userManager.GetUserAsync(User);
-
         if (user != null && !user.EmailConfirmed)
         {
             // If email is not confirmed, redirect them to the login page or another page
@@ -77,7 +85,7 @@ public class HomeController : Controller
         return RedirectToAction("Index");
     }
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = RoleConstants.SuperAdmin)]
     public async Task<IActionResult> EditTable(Data.Models.TaxPayer taxPayer)
     {
         var user = await _userManager.GetUserAsync(User);
@@ -94,7 +102,7 @@ public class HomeController : Controller
         return RedirectToAction("Index");
     }
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = RoleConstants.SuperAdmin)]
     public async Task<IActionResult> DeleteTable(Data.Models.TaxPayer taxPayer)
     {
         var user = await _userManager.GetUserAsync(User);
@@ -111,6 +119,17 @@ public class HomeController : Controller
     public IActionResult Privacy()
     {
         return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> BecomeAdmin()
+    {
+        ApplicationUser? user = await _userManager.GetUserAsync(User);
+        if (user != null)
+        {
+            await _userManager.AddToRoleAsync(user, RoleConstants.SuperAdmin);
+        }
+        return RedirectToAction("Index");
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

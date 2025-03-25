@@ -1,6 +1,8 @@
-﻿using Data.Models;
+﻿using System.Threading.Tasks;
+using Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using TaxPayerWeb.Constants;
 using TaxPayerWeb.Dtos;
 
 namespace TaxPayerWeb.Controllers
@@ -91,6 +93,10 @@ namespace TaxPayerWeb.Controllers
             }
             return RedirectToAction("Index");
         }
+
+
+
+
         [HttpPost]
         public async Task<IActionResult> SignOutUser()
         {

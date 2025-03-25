@@ -2,6 +2,7 @@
 
 @{
 	ViewData["Title"] = "Home Page";
+	bool? IsSuperAdmin = (bool?)ViewData["IsSuperAdmin"] != null ? (bool?)ViewData["IsSuperAdmin"] : false;
 }
 
 <div class="d-flex gap-5 my-4  w-100 justify-content-between align-items-center">
@@ -9,10 +10,21 @@
 		<input style="width: 30vw;min-width:300px; " class="form-control me-2 rounded-3  border-secondary text-light" name="query" placeholder="Search" aria-label="Search">
 	</form>
 	<div class="d-flex gap-2 justify-content-center align-items-center">
-		<button style="width: 10vw; min-width:120px; " type="button" class="btn rounded-3 btn-primary " data-bs-toggle="modal" data-bs-target="#exampleModal">
-			New Payer
-		</button>
+		@if (IsSuperAdmin == true)
+		{
+			<button style="width: 10vw; min-width:120px; " type="button" class="btn rounded-3 btn-primary " data-bs-toggle="modal" data-bs-target="#exampleModal">
+				New Payer
+			</button>
+		}
+		else
+		{
+			<form asp-controller="Home" asp-action="BecomeAdmin" method="post">
+				<button style="width: 10vw; min-width:120px;" type="submit" class="btn rounded-3 btn-primary">
+					Become Super Admin
+				</button>
+			</form>
 
+		}
 		<button class="btn btn-primary" type="button" onclick="window.location.href='/ProfilesPage'" style="width: 10vw; min-width:120px; height: fit-content">Profile</button>
 
 	</div>
@@ -76,7 +88,7 @@
 				{
 					<td valign="middle">
 						<img src="data:image/png;base64,@Convert.ToBase64String(taxPayer.ImageData)
-														" />
+												" />
 					</td>
 				}
 				@if (taxPayer.CityName == null)
@@ -87,7 +99,10 @@
 				{
 					<td valign="middle">@taxPayer.CityName</td>
 				}
-				<td><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="@("#" + taxPayer.Id + "modal")">Edit</button></td>
+				@if (IsSuperAdmin == true)
+				{
+					<td><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="@("#" + taxPayer.Id + "modal")">Edit</button></td>
+				}
 				<td>
 					<div class="modal fade text-start" id="@(taxPayer.Id+"modal")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 						<div class="modal-dialog modal-dialog-centered">
